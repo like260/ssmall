@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.study.mapper.UserMapper">
+
+    <!--
+    private String userId;
+    private String cardType;
+    private String cardNo;
+    private String userName;
+    private String userSex;
+    private Integer useAge;
+    private String useRole;-->
+    <resultMap id="usermap" type="user">
+        <id property="userId" column="user_id"/>
+        <result property="cardType" column="card_type"/>
+        <result property="cardNo" column="card_no"/>
+        <result property="userName" column="user_name"/>
+        <result property="userSex" column="user_sex"/>
+        <result property="useAge" column="user_age" />
+        <result property="useRole" column="user_role"/>
+    </resultMap>
+
+    <sql id="allColumns">
+        user_id,card_type,card_no,user_name,user_sex,user_age,user_role
+    </sql>
+
+    <select id="selectUserPage" resultMap="usermap">
+        select <include refid="allColumns"></include> from user
+        <where>
+            <if test="userName != null and userName != ''">
+                and user_name like concat('%',#{userName},'%')
+            </if>
+
+            <if test="userSex != null and userSex != ''">
+                and user_sex = #{userSex}
+            </if>
+        </where>
+    </select>
+
+    <select id="getRowCount" resultType="int">
+        select count(user_id) from user
+        <where>
+            <if test="userName != null and userName != ''">
+                and user_name like concat('%',#{userName},'%')
+            </if>
+
+            <if test="userSex != null and userSex != ''">
+                and user_sex = #{userSex}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteUserById">
+        delete from user where user_id = #{userId}
+    </delete>
+    <!--
+    private String userId;
+    private String cardType;
+    private String cardNo;
+    private Integer useAge;
+    private String useRole;-->
+    <insert id="createUser" parameterType="user">
+        insert into user values (#{userId},#{cardType},#{cardNo},#{userName},#{userSex},#{useAge},#{useRole})
+    </insert>
+
+    <update id="updateUserById" parameterType="user">
+        update user
+        <set>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="userSex != null and userSex != ''">
+                user_sex = #{userSex},
+            </if>
+            <if test="cardType != null and cardType != ''">
+                card_type = #{cardType},
+            </if>
+            <if test="cardNo != null and cardNo != ''">
+                card_no = #{cardNo},
+            </if>
+            <if test="useAge != null and useAge != 0">
+                user_age = #{useAge},
+            </if>
+            <if test="useRole != null and useRole != ''">
+                user_role = #{useRole},
+            </if>
+        </set>
+            where user_id = #{userId}
+    </update>
+
+<!--    int deleteUserByIdList(String[] userIdList);-->
+    <delete id="deleteUserByIdList">
+        delete from user
+        where user_id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    <!--<delete id="deleteUserByIdList" -->
+
+
+    <!--
+
+    int updateUserById(User user);
+
+    int deleteUserByIdList(String[] userIdList);-->
+</mapper>
